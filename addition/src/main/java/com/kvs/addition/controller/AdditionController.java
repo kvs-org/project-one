@@ -1,5 +1,6 @@
 package com.kvs.addition.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +11,7 @@ import com.kvs.addition.service.AdditionService;
 @RestController
 public class AdditionController {
 	
+	@Autowired
 	private AdditionService addService;
 
 	@GetMapping(path = {"/add"})
