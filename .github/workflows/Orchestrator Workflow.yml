@@ -16,13 +16,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner: 'kvs-org',
               repo: 'project-one',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
-            console.log(response);
 
   project-two:
     name: Run Project-Two Workflow
@@ -33,13 +32,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.actions.createWorkflowDispatch({
-              owner: 'kvs-org,
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'kvs-org',
               repo: 'project-two',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
-            console.log(response);
 
   project-three:
     name: Run Project-Three Workflow
@@ -50,13 +48,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.actions.createWorkflowDispatch({
-              owner: 'kvs-org,
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'kvs-org',
               repo: 'project-three',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
-            console.log(response);
 
   project-four:
     name: Run Project-Four Workflow
@@ -67,10 +64,9 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.actions.createWorkflowDispatch({
-              owner: 'kvs-org,
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'kvs-org',
               repo: 'project-four',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
-            console.log(response);
