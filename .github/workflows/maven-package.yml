@@ -11,16 +11,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write       # Required for pushing changes and creating branches
-      pull-requests: write  # Required for creating pull requests
-
     steps:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WORKFLOW_PAT }}
           fetch-depth: 0
 
       # Set executable permissions for scripts
@@ -70,4 +66,4 @@ jobs:
       - name: Create Pull Request
         run: ./scripts/create-pull-request.sh
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.WORKFLOW_PAT }}
