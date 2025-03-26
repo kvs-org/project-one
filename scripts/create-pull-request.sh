@@ -1,7 +1,7 @@
 #!/bin/bash
 
 curl -X POST \
-  -H "Authorization: Bearer ${WORKFLOW_PAT}" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls \
   -d '{
