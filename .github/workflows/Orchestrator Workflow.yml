@@ -1,0 +1,76 @@
+name: Orchestrator Workflow
+
+on:
+  workflow_dispatch: # Allow manual triggering of the orchestrator workflow
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  project-one:
+    name: Run Project-One Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Project-One Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: 'your-org-or-username',
+              repo: 'project-one',
+              workflow_id: 'maven-package.yml',
+              ref: 'main'
+            });
+            console.log(response);
+
+  project-two:
+    name: Run Project-Two Workflow
+    runs-on: ubuntu-latest
+    needs: project-one # Wait for project-one to complete
+    steps:
+      - name: Trigger Project-Two Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: 'your-org-or-username',
+              repo: 'project-two',
+              workflow_id: 'maven-package.yml',
+              ref: 'main'
+            });
+            console.log(response);
+
+  project-three:
+    name: Run Project-Three Workflow
+    runs-on: ubuntu-latest
+    needs: project-one # Wait for project-one to complete
+    steps:
+      - name: Trigger Project-Three Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: 'your-org-or-username',
+              repo: 'project-three',
+              workflow_id: 'maven-package.yml',
+              ref: 'main'
+            });
+            console.log(response);
+
+  project-four:
+    name: Run Project-Four Workflow
+    runs-on: ubuntu-latest
+    needs: [project-one, project-two] # Wait for project-one and project-two to complete
+    steps:
+      - name: Trigger Project-Four Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: 'your-org-or-username',
+              repo: 'project-four',
+              workflow_id: 'maven-package.yml',
+              ref: 'main'
+            });
+            console.log(response);
