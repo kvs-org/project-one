@@ -1,10 +1,10 @@
 name: Maven Package
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
+  #push:
+    ₹branches:
+      #- main
+    #paths-ignore:
       - 'addition/commit-hash.txt' # Ignore pushes that only modify this file
   workflow_dispatch: # Allow manual triggering by the orchestrator workflow
 
@@ -25,8 +25,8 @@ jobs:
         run: chmod +x scripts/*.sh
 
       # Check for new commits
-      - name: Check for new commits
-        run: ./scripts/check-commits.sh
+      #- name: Check for new commits
+      #  run: ./scripts/check-commits.sh
 
       # Set up JDK
       - name: Set up JDK 17
@@ -56,15 +56,15 @@ jobs:
         working-directory: addition
 
       # Store commit hash in a file
-      - name: Save Commit Hash
-        run: ./scripts/save-commit-hash.sh
+      #- name: Save Commit Hash
+      #  run: ./scripts/save-commit-hash.sh
 
       # Create a new branch for the commit
-      - name: Create Branch
-        run: ./scripts/create-branch.sh
+      #- name: Create Branch
+      #  run: ./scripts/create-branch.sh
 
       # Create a pull request using the GitHub REST API
-      - name: Create Pull Request
-        run: ./scripts/create-pull-request.sh
-        env:
-          TOKEN: ${{ secrets.WORKFLOW_PAT }}
+      #- name: Create Pull Request
+      #  run: ./scripts/create-pull-request.sh
+      #  env:
+      #    TOKEN: ${{ secrets.WORKFLOW_PAT }}
