@@ -5,7 +5,7 @@ on:
     #branches:
       #- main
     #paths-ignore:
-      - 'addition/commit-hash.txt' # Ignore pushes that only modify this file
+     # - 'addition/commit-hash.txt' # Ignore pushes that only modify this file
   workflow_dispatch: # Allow manual triggering by the orchestrator workflow
 
 jobs:
