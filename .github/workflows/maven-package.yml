@@ -2,7 +2,7 @@ name: Maven Package
 
 on:
   #push:
-    ₹branches:
+    #branches:
       #- main
     #paths-ignore:
       - 'addition/commit-hash.txt' # Ignore pushes that only modify this file
