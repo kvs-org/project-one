@@ -5,7 +5,9 @@ on:
 
 permissions:
   actions: write
-  contents: read
+  contents: write 
+  repository-projects: write
+  
 
 jobs:
   project-one:
