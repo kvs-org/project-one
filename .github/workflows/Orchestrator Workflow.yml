@@ -34,7 +34,7 @@ jobs:
             const owner = 'kvs-org';
             const repo = 'project-one';
             const workflow_id = 'maven-package.yml';
-            const ref = 'main';
+            const branch = 'main';
             let status = 'in_progress';
 
             while (status === 'in_progress' || status === 'queued') {
@@ -42,18 +42,20 @@ jobs:
                 owner,
                 repo,
                 workflow_id,
-                branch: ref,
-                status: 'in_progress'
+                branch
               });
 
               if (runs.data.workflow_runs.length > 0) {
-                status = runs.data.workflow_runs[0].status;
-                if (status === 'completed') {
-                  const conclusion = runs.data.workflow_runs[0].conclusion;
-                  if (conclusion !== 'success') {
-                    throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                const latestRun = runs.data.workflow_runs.find(run => run.head_branch === branch);
+                if (latestRun) {
+                  status = latestRun.status;
+                  if (status === 'completed') {
+                    const conclusion = latestRun.conclusion;
+                    if (conclusion !== 'success') {
+                      throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                    }
+                    break;
                   }
-                  break;
                 }
               }
 
