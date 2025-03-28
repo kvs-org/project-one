@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Project-One Workflow
+        id: trigger-project-one
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
@@ -24,12 +25,49 @@ jobs:
               ref: 'main'
             });
 
+      - name: Wait for Project-One Workflow to Complete
+        id: wait-for-project-one
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_PAT }}
+          script: |
+            const owner = 'kvs-org';
+            const repo = 'project-one';
+            const workflow_id = 'maven-package.yml';
+            const ref = 'main';
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id,
+                branch: ref,
+                status: 'in_progress'
+              });
+
+              if (runs.data.workflow_runs.length > 0) {
+                status = runs.data.workflow_runs[0].status;
+                if (status === 'completed') {
+                  const conclusion = runs.data.workflow_runs[0].conclusion;
+                  if (conclusion !== 'success') {
+                    throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                  }
+                  break;
+                }
+              }
+
+              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
+            }
+
   project-two:
     name: Run Project-Two Workflow
     runs-on: ubuntu-latest
     needs: [project-one] # Wait for project-one to complete
     steps:
       - name: Trigger Project-Two Workflow
+        id: trigger-project-two
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
@@ -41,12 +79,49 @@ jobs:
               ref: 'main'
             });
 
+      - name: Wait for Project-Two Workflow to Complete
+        id: wait-for-project-two
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_PAT }}
+          script: |
+            const owner = 'kvs-org';
+            const repo = 'project-two';
+            const workflow_id = 'maven-package.yml';
+            const ref = 'main';
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id,
+                branch: ref,
+                status: 'in_progress'
+              });
+
+              if (runs.data.workflow_runs.length > 0) {
+                status = runs.data.workflow_runs[0].status;
+                if (status === 'completed') {
+                  const conclusion = runs.data.workflow_runs[0].conclusion;
+                  if (conclusion !== 'success') {
+                    throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                  }
+                  break;
+                }
+              }
+
+              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
+            }
+
   project-three:
     name: Run Project-Three Workflow
     runs-on: ubuntu-latest
-    needs: [project-one, project-two] # Wait for project-one and project-two to complete
+    needs: [project-two] # Wait for project-two to complete
     steps:
       - name: Trigger Project-Three Workflow
+        id: trigger-project-three
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
@@ -58,12 +133,49 @@ jobs:
               ref: 'main'
             });
 
+      - name: Wait for Project-Three Workflow to Complete
+        id: wait-for-project-three
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_PAT }}
+          script: |
+            const owner = 'kvs-org';
+            const repo = 'project-three';
+            const workflow_id = 'maven-package.yml';
+            const ref = 'main';
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id,
+                branch: ref,
+                status: 'in_progress'
+              });
+
+              if (runs.data.workflow_runs.length > 0) {
+                status = runs.data.workflow_runs[0].status;
+                if (status === 'completed') {
+                  const conclusion = runs.data.workflow_runs[0].conclusion;
+                  if (conclusion !== 'success') {
+                    throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                  }
+                  break;
+                }
+              }
+
+              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
+            }
+
   project-four:
     name: Run Project-Four Workflow
     runs-on: ubuntu-latest
-    needs: [project-one, project-two, project-three] # Wait for project-one, project-two, and project-three to complete
+    needs: [project-three] # Wait for project-three to complete
     steps:
       - name: Trigger Project-Four Workflow
+        id: trigger-project-four
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
@@ -74,3 +186,39 @@ jobs:
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
+
+      - name: Wait for Project-Four Workflow to Complete
+        id: wait-for-project-four
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_PAT }}
+          script: |
+            const owner = 'kvs-org';
+            const repo = 'project-four';
+            const workflow_id = 'maven-package.yml';
+            const ref = 'main';
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id,
+                branch: ref,
+                status: 'in_progress'
+              });
+
+              if (runs.data.workflow_runs.length > 0) {
+                status = runs.data.workflow_runs[0].status;
+                if (status === 'completed') {
+                  const conclusion = runs.data.workflow_runs[0].conclusion;
+                  if (conclusion !== 'success') {
+                    throw new Error(`Workflow failed with conclusion: ${conclusion}`);
+                  }
+                  break;
+                }
+              }
+
+              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
+            }
