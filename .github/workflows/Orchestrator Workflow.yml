@@ -44,7 +44,7 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
               }
             }
-            core.setOutput('runId', runId); # Set the runId as an output of this step
+            core.setOutput('runId', runId); 
 
       - name: Wait for Project-One Workflow to Complete
         id: wait-for-project-one
