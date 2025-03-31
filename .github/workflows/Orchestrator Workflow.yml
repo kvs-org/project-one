@@ -44,7 +44,7 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
               }
             }
-            core.setOutput('runId', runId); 
+            core.setOutput('runId', runId); // Set the runId as an output of this step
 
       - name: Wait for Project-One Workflow to Complete
         id: wait-for-project-one
@@ -54,7 +54,7 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-one';
-            const runId = ${{ steps.trigger-project-one.outputs.runId }}; # Access the output from the previous step
+            const runId = process.env['RUN_ID']; // Access runId from environment variable
             let status = 'in_progress';
 
             console.log(`Polling for Project-One Workflow completion (Run ID: ${runId})...`);
@@ -126,7 +126,7 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-two';
-            const runId = ${{ steps.trigger-project-two.outputs.runId }};
+            const runId = process.env['RUN_ID']; // Access runId from environment variable
             let status = 'in_progress';
 
             console.log(`Polling for Project-Two Workflow completion (Run ID: ${runId})...`);
@@ -198,7 +198,7 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-three';
-            const runId = ${{ steps.trigger-project-three.outputs.runId }};
+            const runId = process.env['RUN_ID']; // Access runId from environment variable
             let status = 'in_progress';
 
             console.log(`Polling for Project-Three Workflow completion (Run ID: ${runId})...`);
@@ -270,7 +270,7 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-four';
-            const runId = ${{ steps.trigger-project-four.outputs.runId }};
+            const runId = process.env['RUN_ID']; // Access runId from environment variable
             let status = 'in_progress';
 
             console.log(`Polling for Project-Four Workflow completion (Run ID: ${runId})...`);
