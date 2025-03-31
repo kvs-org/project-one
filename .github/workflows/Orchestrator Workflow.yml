@@ -19,13 +19,32 @@ jobs:
           github-token: ${{ secrets.WORKFLOW_PAT }}
           script: |
             console.log('Triggering Project-One Workflow...');
-            await github.rest.actions.createWorkflowDispatch({
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'kvs-org',
               repo: 'project-one',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
             console.log('Project-One Workflow triggered successfully.');
+            console.log('Waiting for the workflow run to appear...');
+            let runId;
+            while (!runId) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: 'kvs-org',
+                repo: 'project-one',
+                workflow_id: 'maven-package.yml',
+                branch: 'main',
+                status: 'in_progress'
+              });
+              if (runs.data.workflow_runs.length > 0) {
+                runId = runs.data.workflow_runs[0].id;
+                console.log(`Found workflow run with ID: ${runId}`);
+              } else {
+                console.log('Workflow run not yet available. Retrying in 10 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+              }
+            }
+            return { runId };
 
       - name: Wait for Project-One Workflow to Complete
         id: wait-for-project-one
@@ -35,41 +54,28 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-one';
-            const workflow_id = 'maven-package.yml';
-            const branch = 'main';
+            const runId = steps.trigger-project-one.outputs.runId;
             let status = 'in_progress';
 
-            console.log(`Polling for Project-One Workflow completion...`);
+            console.log(`Polling for Project-One Workflow completion (Run ID: ${runId})...`);
             while (status === 'in_progress' || status === 'queued') {
-              const runs = await github.rest.actions.listWorkflowRuns({
+              const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
-                workflow_id,
-                branch
+                run_id: runId
               });
 
-              console.log(`Found ${runs.data.workflow_runs.length} workflow runs for branch '${branch}'.`);
-              if (runs.data.workflow_runs.length > 0) {
-                const latestRun = runs.data.workflow_runs.find(run => run.head_branch === branch);
-                if (latestRun) {
-                  console.log(`Latest run ID: ${latestRun.id}, Status: ${latestRun.status}, Conclusion: ${latestRun.conclusion}`);
-                  status = latestRun.status;
-                  if (status === 'completed') {
-                    const conclusion = latestRun.conclusion;
-                    if (conclusion !== 'success') {
-                      throw new Error(`Project-One Workflow failed with conclusion: ${conclusion}`);
-                    }
-                    console.log('Project-One Workflow completed successfully.');
-                    break;
-                  }
-                } else {
-                  console.log('No matching workflow run found for the specified branch.');
+              status = run.data.status;
+              console.log(`Workflow Run ID: ${runId}, Status: ${status}, Conclusion: ${run.data.conclusion}`);
+              if (status === 'completed') {
+                if (run.data.conclusion !== 'success') {
+                  throw new Error(`Project-One Workflow failed with conclusion: ${run.data.conclusion}`);
                 }
-              } else {
-                console.log('No workflow runs found.');
+                console.log('Project-One Workflow completed successfully.');
+                break;
               }
 
-              console.log(`Workflow status: ${status}. Waiting for 30 seconds before polling again...`);
+              console.log('Workflow still in progress. Waiting for 30 seconds...');
               await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
             }
 
@@ -85,13 +91,32 @@ jobs:
           github-token: ${{ secrets.WORKFLOW_PAT }}
           script: |
             console.log('Triggering Project-Two Workflow...');
-            await github.rest.actions.createWorkflowDispatch({
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'kvs-org',
               repo: 'project-two',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
             console.log('Project-Two Workflow triggered successfully.');
+            console.log('Waiting for the workflow run to appear...');
+            let runId;
+            while (!runId) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: 'kvs-org',
+                repo: 'project-two',
+                workflow_id: 'maven-package.yml',
+                branch: 'main',
+                status: 'in_progress'
+              });
+              if (runs.data.workflow_runs.length > 0) {
+                runId = runs.data.workflow_runs[0].id;
+                console.log(`Found workflow run with ID: ${runId}`);
+              } else {
+                console.log('Workflow run not yet available. Retrying in 10 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+              }
+            }
+            return { runId };
 
       - name: Wait for Project-Two Workflow to Complete
         id: wait-for-project-two
@@ -101,41 +126,28 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-two';
-            const workflow_id = 'maven-package.yml';
-            const branch = 'main';
+            const runId = steps.trigger-project-two.outputs.runId;
             let status = 'in_progress';
 
-            console.log(`Polling for Project-Two Workflow completion...`);
+            console.log(`Polling for Project-Two Workflow completion (Run ID: ${runId})...`);
             while (status === 'in_progress' || status === 'queued') {
-              const runs = await github.rest.actions.listWorkflowRuns({
+              const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
-                workflow_id,
-                branch
+                run_id: runId
               });
 
-              console.log(`Found ${runs.data.workflow_runs.length} workflow runs for branch '${branch}'.`);
-              if (runs.data.workflow_runs.length > 0) {
-                const latestRun = runs.data.workflow_runs.find(run => run.head_branch === branch);
-                if (latestRun) {
-                  console.log(`Latest run ID: ${latestRun.id}, Status: ${latestRun.status}, Conclusion: ${latestRun.conclusion}`);
-                  status = latestRun.status;
-                  if (status === 'completed') {
-                    const conclusion = latestRun.conclusion;
-                    if (conclusion !== 'success') {
-                      throw new Error(`Project-Two Workflow failed with conclusion: ${conclusion}`);
-                    }
-                    console.log('Project-Two Workflow completed successfully.');
-                    break;
-                  }
-                } else {
-                  console.log('No matching workflow run found for the specified branch.');
+              status = run.data.status;
+              console.log(`Workflow Run ID: ${runId}, Status: ${status}, Conclusion: ${run.data.conclusion}`);
+              if (status === 'completed') {
+                if (run.data.conclusion !== 'success') {
+                  throw new Error(`Project-Two Workflow failed with conclusion: ${run.data.conclusion}`);
                 }
-              } else {
-                console.log('No workflow runs found.');
+                console.log('Project-Two Workflow completed successfully.');
+                break;
               }
 
-              console.log(`Workflow status: ${status}. Waiting for 30 seconds before polling again...`);
+              console.log('Workflow still in progress. Waiting for 30 seconds...');
               await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
             }
 
@@ -150,12 +162,33 @@ jobs:
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            console.log('Triggering Project-Three Workflow...');
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'kvs-org',
               repo: 'project-three',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
+            console.log('Project-Three Workflow triggered successfully.');
+            console.log('Waiting for the workflow run to appear...');
+            let runId;
+            while (!runId) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: 'kvs-org',
+                repo: 'project-three',
+                workflow_id: 'maven-package.yml',
+                branch: 'main',
+                status: 'in_progress'
+              });
+              if (runs.data.workflow_runs.length > 0) {
+                runId = runs.data.workflow_runs[0].id;
+                console.log(`Found workflow run with ID: ${runId}`);
+              } else {
+                console.log('Workflow run not yet available. Retrying in 10 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+              }
+            }
+            return { runId };
 
       - name: Wait for Project-Three Workflow to Complete
         id: wait-for-project-three
@@ -165,33 +198,28 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-three';
-            const workflow_id = 'maven-package.yml';
-            const branch = 'main';
+            const runId = steps.trigger-project-three.outputs.runId;
             let status = 'in_progress';
 
+            console.log(`Polling for Project-Three Workflow completion (Run ID: ${runId})...`);
             while (status === 'in_progress' || status === 'queued') {
-              const runs = await github.rest.actions.listWorkflowRuns({
+              const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
-                workflow_id,
-                branch
+                run_id: runId
               });
 
-              if (runs.data.workflow_runs.length > 0) {
-                const latestRun = runs.data.workflow_runs.find(run => run.head_branch === branch);
-                if (latestRun) {
-                  status = latestRun.status;
-                  if (status === 'completed') {
-                    const conclusion = latestRun.conclusion;
-                    if (conclusion !== 'success') {
-                      throw new Error(`Workflow failed with conclusion: ${conclusion}`);
-                    }
-                    break;
-                  }
+              status = run.data.status;
+              console.log(`Workflow Run ID: ${runId}, Status: ${status}, Conclusion: ${run.data.conclusion}`);
+              if (status === 'completed') {
+                if (run.data.conclusion !== 'success') {
+                  throw new Error(`Project-Three Workflow failed with conclusion: ${run.data.conclusion}`);
                 }
+                console.log('Project-Three Workflow completed successfully.');
+                break;
               }
 
-              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              console.log('Workflow still in progress. Waiting for 30 seconds...');
               await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
             }
 
@@ -206,12 +234,33 @@ jobs:
         with:
           github-token: ${{ secrets.WORKFLOW_PAT }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            console.log('Triggering Project-Four Workflow...');
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'kvs-org',
               repo: 'project-four',
               workflow_id: 'maven-package.yml',
               ref: 'main'
             });
+            console.log('Project-Four Workflow triggered successfully.');
+            console.log('Waiting for the workflow run to appear...');
+            let runId;
+            while (!runId) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: 'kvs-org',
+                repo: 'project-four',
+                workflow_id: 'maven-package.yml',
+                branch: 'main',
+                status: 'in_progress'
+              });
+              if (runs.data.workflow_runs.length > 0) {
+                runId = runs.data.workflow_runs[0].id;
+                console.log(`Found workflow run with ID: ${runId}`);
+              } else {
+                console.log('Workflow run not yet available. Retrying in 10 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+              }
+            }
+            return { runId };
 
       - name: Wait for Project-Four Workflow to Complete
         id: wait-for-project-four
@@ -221,32 +270,27 @@ jobs:
           script: |
             const owner = 'kvs-org';
             const repo = 'project-four';
-            const workflow_id = 'maven-package.yml';
-            const branch = 'main';
+            const runId = steps.trigger-project-four.outputs.runId;
             let status = 'in_progress';
 
+            console.log(`Polling for Project-Four Workflow completion (Run ID: ${runId})...`);
             while (status === 'in_progress' || status === 'queued') {
-              const runs = await github.rest.actions.listWorkflowRuns({
+              const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
-                workflow_id,
-                branch
+                run_id: runId
               });
 
-              if (runs.data.workflow_runs.length > 0) {
-                const latestRun = runs.data.workflow_runs.find(run => run.head_branch === branch);
-                if (latestRun) {
-                  status = latestRun.status;
-                  if (status === 'completed') {
-                    const conclusion = latestRun.conclusion;
-                    if (conclusion !== 'success') {
-                      throw new Error(`Workflow failed with conclusion: ${conclusion}`);
-                    }
-                    break;
-                  }
+              status = run.data.status;
+              console.log(`Workflow Run ID: ${runId}, Status: ${status}, Conclusion: ${run.data.conclusion}`);
+              if (status === 'completed') {
+                if (run.data.conclusion !== 'success') {
+                  throw new Error(`Project-Four Workflow failed with conclusion: ${run.data.conclusion}`);
                 }
+                console.log('Project-Four Workflow completed successfully.');
+                break;
               }
 
-              console.log(`Workflow status: ${status}. Waiting for 30 seconds...`);
+              console.log('Workflow still in progress. Waiting for 30 seconds...');
               await new Promise(resolve => setTimeout(resolve, 30000)); // Wait for 30 seconds
             }
