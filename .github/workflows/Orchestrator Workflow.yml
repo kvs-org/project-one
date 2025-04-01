@@ -26,6 +26,7 @@ jobs:
               ref: 'main'
             });
             console.log('Project-One Workflow triggered successfully.');
+            console.log(response);
             console.log('Waiting for the workflow run to appear...');
             let runId;
             while (!runId) {
